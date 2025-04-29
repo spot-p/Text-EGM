@@ -98,9 +98,9 @@ def main(args):
 
     ensure_directory_exists('../data')
 
-    np.save('../data/train_intra2.npy', train)
-    np.save('../data/val_intra2.npy', val)
-    np.save('../data/test_intra2.npy', test)
+    np.save('../data/train_intra.npy', train)
+    np.save('../data/val_intra.npy', val)
+    np.save('../data/test_intra.npy', test)
 
 if __name__ == '__main__':
     args = get_args()
