@@ -1,6 +1,5 @@
 # Reproduction of Text-EGM: [Interpretation of Intracardiac Electrograms Through Textual Representations]
-This repository contains our reproduction of the paper Interpretation of Intracardiac Electrograms Through Textual Representations by Han et al., 2024.
-The official code base can be found at willxxy/Text-EGM.
+This repository contains our reproduction of the paper "Interpretation of Intracardiac Electrograms Through Textual Representations" by Han et al., 2024. accessible here https://arxiv.org/abs/2402.01115 . The official code base can be found at willxxy/Text-EGM.
 
 ## Scope of Reproduction:
 Our goal was to reproduce the key components of the model-pipeline, inferred metrics and visualizations against the external dataset used in the paper.
