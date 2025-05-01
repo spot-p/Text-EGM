@@ -78,8 +78,11 @@ if __name__ == '__main__':
     torch.manual_seed(123)
     np.random.seed(123)
     
-    norm_test = np.load(f'../data/test_data_by_placement_na_True_True_True_False_False.npy', allow_pickle=True).item()
-    afib_test = np.load(f'../data/test_data_by_placement_na_True_True_True_False_True.npy', allow_pickle=True).item()
+    #norm_test = np.load(f'../data/test_data_by_placement_na_True_True_True_False_False.npy', allow_pickle=True).item()
+    #afib_test = np.load(f'../data/test_data_by_placement_na_True_True_True_False_True.npy', allow_pickle=True).item()
+    
+    norm_test = np.load(f'../data/test_intra.npy', allow_pickle=True).item()
+    afib_test = np.load(f'../data/test_intra.npy', allow_pickle=True).item()
     
     norm_test.update(afib_test)
     test = norm_test
@@ -221,7 +224,7 @@ if __name__ == '__main__':
         mask_token_indices = torch.where(input_ids == mask_id)[1].tolist()
         
         with torch.no_grad():
-            if args.model == 'big' or args.model == 'clin_big':
+            if args.model == 'big' or args.model == 'clin_bird':
                 outputs = model(input_ids = input_ids, attention_mask = attention_in, output_attentions = True)
             if args.model == 'long' or args.model == 'clin_long':
                 outputs = model(input_ids = input_ids, attention_mask = attention_in, output_attentions = True, global_attention_mask = mask_ids)

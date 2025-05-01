@@ -17,6 +17,7 @@ from optim import ScheduledOptim, early_stopping
 from models import VITModel, TimeSeriesModel
 from runners import trainer, validate
 
+
 def get_args():
     parser = argparse.ArgumentParser(description=None)
     parser.add_argument('--lr', type = float, default = 1e-4, help='Please choose the learning rate')
@@ -36,6 +37,7 @@ def get_args():
     parser.add_argument('--TA', action='store_true', help = 'Please choose whether to do Token Addition')
     parser.add_argument('--LF', action='store_true', help = 'Please choose whether to do label flipping')
     parser.add_argument('--toy', action = 'store_true', help = 'Please choose whether to use a toy dataset or not')
+    parser.add_argument('--norm_loss', type=float, default=0.1, help = "Specify norm loss coefficient")
     parser.add_argument('--inference', action='store_true', help = 'Please choose whether it is inference or not')
     return parser.parse_args()
     
@@ -55,10 +57,18 @@ def ensure_directory_exists(directory_path):
     else:
         print(f"Directory already exists: {directory_path}")
 
+def does_checkpoint_exist(directory_path):
+    if os.path.exists(f'./{directory_path}/current_epoch.chkpt'):
+        return True
+    else:
+        return False
+
 def main():
     args = get_args()
     directory_path = f'./runs/checkpoint/saved_best_{args.lr}_{args.batch}_{args.patience}_{args.weight_decay}_{args.model}_{args.use_ce}_{args.mask}_{args.mlm_weight}_{args.ce_weight}_{args.toy}_{args.norm_loss}_{args.TS}_{args.TA}_{args.LF}'
+    current_epoch_path = f'./runs/checkpoint/saved_current_epoch_{args.lr}_{args.batch}_{args.patience}_{args.weight_decay}_{args.model}_{args.use_ce}_{args.mask}_{args.mlm_weight}_{args.ce_weight}_{args.toy}_{args.norm_loss}_{args.TS}_{args.TA}_{args.LF}'
     ensure_directory_exists(directory_path)
+    ensure_directory_exists(current_epoch_path)
 
     gc.collect()
     torch.cuda.empty_cache()
@@ -170,7 +180,6 @@ def main():
     optimizer = ScheduledOptim(
     Adam(filter(lambda x: x.requires_grad, model.parameters()),
         betas=(0.9, 0.98), eps=1e-4, lr = args.lr, weight_decay=args.weight_decay), model_hidden_size, args.warmup)
-
     if args.use_ce:
         ce_loss = nn.CrossEntropyLoss(reduction = 'none')
     else:
@@ -179,31 +188,60 @@ def main():
     train_losses = []
     val_losses = []
     all_epochs = []
-    for epoch in range(args.epochs):
-        
+    starting_epoch = -1
+    if(does_checkpoint_exist(current_epoch_path)):
+        checkpoint = torch.load(f'./{current_epoch_path}/current_epoch.chkpt',weights_only=False)
+        model.load_state_dict(checkpoint['model'])
+        starting_epoch = checkpoint['epoch']
+        print(f"resuming from epoch {starting_epoch + 1}...")
+        train_losses = checkpoint['train_losses']
+        val_losses = checkpoint['val_losses']
+        all_epochs = checkpoint['all_epochs']
+        optimizer._optimizer.load_state_dict(checkpoint['optimizer'])
+
+        for key, value in checkpoint['scheduler'].items():
+            if hasattr(optimizer, key):
+                setattr(optimizer, key, value)
+        print(all_epochs)
+    else:
+        print("starting from epoch 0...")
+    for epoch in range(starting_epoch + 1, args.epochs):
+        model_state_dict = model.state_dict()
+            
         all_epochs.append(epoch)
         train_loss = trainer(model, train_loader, optimizer, device, args, ce_loss)
         print(f"Training - Epoch: {epoch+1},Train Loss: {train_loss}")
         train_losses.append(train_loss)
-        
+            
         val_loss = validate(model, val_loader, device, args, ce_loss)
         print(f"Evaluation - Epoch: {epoch+1}, Val Loss: {val_loss}")
         val_losses.append(val_loss)
-        
-        model_state_dict = model.state_dict()
             
+        model_state_dict = model.state_dict()
+                
         checkpoint = {
             'model' : model_state_dict,
             'config_file' : 'config',
             'epoch' : epoch
         }
-        
+            
         if val_loss <= min(val_losses):
             torch.save(checkpoint, f'./{directory_path}/best_checkpoint.chkpt')
-            print('    - [Info] The checkpoint file has been updated.')
-        
+            print('    - [Info] The best checkpoint file has been updated.')
+        checkpoint = {
+            'model' : model_state_dict,
+            'config_file' : 'config',
+            'optimizer': optimizer._optimizer.state_dict(),  # Save wrapped Adam optimizer
+            'scheduler': optimizer.__dict__,
+            'epoch' : epoch,
+            'val_losses' : val_losses,
+            'train_losses': train_losses,
+            'all_epochs': all_epochs
+        }
+        torch.save(checkpoint, f'./{current_epoch_path}/current_epoch.chkpt')
+        print("the latest epoch's checkpoint has been saved")
         early_stop = early_stopping(val_losses, patience = args.patience, delta = 0.01)
-    
+        
         if early_stop:
             print('Validation loss has stopped decreasing. Early stopping...')
             break   
@@ -220,5 +258,5 @@ def main():
     plt.close()
 
 if __name__ == '__main__':
-    
+    print(torch.cuda.is_available())
     main()

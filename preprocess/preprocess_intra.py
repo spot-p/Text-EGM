@@ -9,8 +9,13 @@ def get_args():
     return parser.parse_args()
 
 def z_score_normalization(data):
-    mean_val = np.mean(data, axis=(0, 1), keepdims=True)
-    std_val = np.std(data, axis=(0, 1), keepdims=True)
+    nan_indices = np.isnan(data)
+    for idx in zip(*np.where(nan_indices)):
+        # replacing NaN with mean of entire placement (axis 0 and 1)
+        data[idx] = np.nanmean(data[:, idx[1], idx[2]])
+    mean_val = np.nanmean(data, axis=(0, 1), keepdims=True)
+    std_val = np.nanstd(data, axis=(0, 1), keepdims=True)
+    std_val[std_val == 0] = 1
     normalized_data = (data - mean_val) / std_val
     return normalized_data
 
@@ -72,7 +77,7 @@ def ensure_directory_exists(directory_path):
         print(f"Directory already exists: {directory_path}")
 
 def main(args):
-    egm_signals = read_all(args)
+    egm_signals = read_all(args.path)
     normalized_egm = z_score_normalization(egm_signals)
     segmented_data = segment_signal(normalized_egm, 1000)
 

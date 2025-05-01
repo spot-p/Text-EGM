@@ -279,31 +279,47 @@ def inference(model, tokenizer, test_dataloader, device, args):
 
             count_index +=1
             
-    if args.model == 'vit' or args.model == 'big_ts' or args.model == 'long_ts':
-        print("Average Accuracy for Afib:", np.mean(mean_accuracies_afib))
-    else:
-        print('MSE for Signal Interpolation', np.mean(MSEs_signals))
-        print('MAE for Signal Interpolation', np.mean(MAEs_signals))
-        print("Average Accuracy for AFib:", np.mean(mean_accuracies_afib))
-    
-    cm = confusion_matrix(ground_truth_afib, pred_afib)
-    print(f'Confusion Matrix: {cm}')
+    with open('results.txt', 'a') as f:
+        f.write(f'Model:{args.model}, Args:{args}')
+        if args.model == 'vit' or args.model == 'big_ts' or args.model == 'long_ts':
+            avg_acc = np.mean(mean_accuracies_afib)
+            print("Average Accuracy for Afib:", avg_acc)
+            f.write(f"Average Accuracy for Afib: {avg_acc}\n")
+        else:
+            mse = np.mean(MSEs_signals)
+            mae = np.mean(MAEs_signals)
+            avg_acc = np.mean(mean_accuracies_afib)
+            print('MSE for Signal Interpolation', mse)
+            print('MAE for Signal Interpolation', mae)
+            print("Average Accuracy for AFib:", avg_acc)
+            f.write(f"MSE for Signal Interpolation: {mse}\n")
+            f.write(f"MAE for Signal Interpolation: {mae}\n")
+            f.write(f"Average Accuracy for AFib: {avg_acc}\n")
+        
+        cm = confusion_matrix(ground_truth_afib, pred_afib)
+        print(f'Confusion Matrix: {cm}')
+        f.write(f'Confusion Matrix: {cm.tolist()}\n')  # convert to list for better formatting
 
-    try:
-        TP = cm[0, 0]
-        FN = cm[0, 1]
-        FP = cm[1, 0]
-        TN = cm[1, 1]
-        sensitivity = TP / float(TP + FN) if (TP + FN) != 0 else 0
-        specificity = TN / float(TN + FP) if (TN + FP) != 0 else 0
-        npv = TN / float(TN + FN) if (TN + FN) != 0 else 0
-        ppv = TP / float(TP + FP) if (TP + FP) != 0 else 0
-        print("Sensitivity:", sensitivity)
-        print("Specificity:", specificity)
-        print("NPV:", npv)
-        print("PPV:", ppv)
-    except:
-        print('ravel error')
+        try:
+            TP = cm[0, 0]
+            FN = cm[0, 1]
+            FP = cm[1, 0]
+            TN = cm[1, 1]
+            sensitivity = TP / float(TP + FN) if (TP + FN) != 0 else 0
+            specificity = TN / float(TN + FP) if (TN + FP) != 0 else 0
+            npv = TN / float(TN + FN) if (TN + FN) != 0 else 0
+            ppv = TP / float(TP + FP) if (TP + FP) != 0 else 0
+            print("Sensitivity:", sensitivity)
+            print("Specificity:", specificity)
+            print("NPV:", npv)
+            print("PPV:", ppv)
+            f.write(f"Sensitivity: {sensitivity}\n")
+            f.write(f"Specificity: {specificity}\n")
+            f.write(f"NPV: {npv}\n")
+            f.write(f"PPV: {ppv}\n")
+        except:
+            print('ravel error')
+            f.write('ravel error\n')
         
     if args.model == 'long' or args.model == 'clin_long'or args.model == 'raw_long':
         np_save = {

@@ -8,6 +8,7 @@ from pyts.image import GramianAngularField, RecurrencePlot, MarkovTransitionFiel
 class EGMDataset(Dataset):
     def __init__(self, data_dict, tokenizer = None, args = None):
         self.data = list(data_dict.values())
+        #print(self.data[0])
         self.keys = list(data_dict.keys())
         self.args = args
         self.signal_size = self.args.signal_size

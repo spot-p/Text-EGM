@@ -1,4 +1,9 @@
-from data_loader import EGMDataset2
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from data_loader import EGMDataset
 import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader
 import numpy as np
@@ -11,6 +16,7 @@ def get_args():
     parser.add_argument('--data', type=str, default = None, help = 'Please choose the dataset you want to visualize')
     parser.add_argument('--mask', type=float, default = None, help = 'Please choose the percentage of masking')
     parser.add_argument('--ratio', type=int, default = None, help = 'Please choose the ratio')
+    parser.add_argument('--signal_size', type=int, default = 250, help = 'Please choose the ratio')
     parser.add_argument('--vocab_size', type=int, default = None, help = 'Please choose the vocab size')
     parser.add_argument('--viz_tokens', action='store_true', help = 'Please choose whether to visualize tokens or not')
     return parser.parse_args()
@@ -74,6 +80,6 @@ def visualize_tokens(dataset, num_samples=1, args = None, vocab_size = None):
 if __name__ == '__main__':
     args = get_args()
     val = np.load(args.data, allow_pickle=True).item()
-    dataset = EGMDataset2(val, vocab_size = args.vocab_size, args = args)
+    dataset = EGMDataset(val, args = args)
     dataloader = DataLoader(dataset, batch_size=1, shuffle=False)   
     visualize_tokens(dataloader, args=args, vocab_size = args.vocab_size)
