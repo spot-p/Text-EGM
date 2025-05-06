@@ -30,14 +30,40 @@ def trainer(model, train_dataloader, optimizer, device, args, ce = None):
                 logits = outputs.logits
                 
             if args.model == 'long' or args.model == 'clin_long' or args.model == 'raw_long':
-                
-                outputs = model(input_ids = batch_data, attention_mask = batch_attention_mask, labels = tokenized_sample, output_hidden_states = True, global_attention_mask = mask)
-                logits = outputs.logits
-        
+                if args.ablation == 'no_head':
+                  num_classes = 2
+                  outputs = model(input_ids=batch_data, attention_mask=batch_attention_mask, output_hidden_states=True, global_attention_mask=mask)
+                  hidden_states = outputs.hidden_states[-1]  # Get last hidden state
+                  logits = hidden_states[:, -2, :]  # Choose the second-to-last token (or adjust this as necessary)
+                  if not hasattr(model, 'logits_projection'):
+                    model.logits_projection = torch.nn.Linear(768, 2).to(device)  # Creating a linear layer to project to 2 classes
+                  logits = model.logits_projection(logits)  # Shape: [batch_size, 2]
+                  print(f"Logits shape: {logits.shape}")  # Debugging: check the shape
+                  afib_label = tokenized_sample[:, -2]  # Assume you want the label for the second-to-last token
+                  assert afib_label.min() >= 0 and afib_label.max() < num_classes, "Labels are out of expected range"
+
+                  if ce is not None:
+                      loss = ce(logits, afib_label)
+                  else:
+                      loss = torch.tensor(0.0, device=device)
+
+                  # Ensure loss is scalar before calling loss.item()
+                  if isinstance(loss, torch.Tensor):
+                      if loss.dim() == 0:
+                          print(f"Loss: {loss.item()}")  # If loss is scalar
+                      else:
+                          loss = torch.mean(loss)  # Average loss if it's not scalar
+                          print(f"Loss after averaging: {loss.item()}")  # Now it's safe to call item()
+                else:
+                  outputs = model(input_ids=batch_data, attention_mask=batch_attention_mask, labels=tokenized_sample, output_hidden_states=True, global_attention_mask=mask)
+                  logits = outputs.logits 
+                  #print(f"Logits shape without ablation: {logits.shape}")
+                      
             loss = outputs.loss
             loss = torch.mean(loss)
     
             if ce != None:
+              if args.ablation != 'no_head':
                 logits_reshaped = logits.view(batch_data.size(0), batch_data.size(1), -1)
                 afib_logits = logits_reshaped[:, -2, :]
                 afib_label = tokenized_sample[:, -2]
@@ -80,9 +106,15 @@ def validate(model, val_dataloader, device, args, ce = None):
                     outputs = model(input_ids = batch_data, attention_mask = batch_attention_mask, labels = tokenized_sample, output_hidden_states = True)
                     logits = outputs.logits
                 if args.model == 'long' or args.model == 'clin_long' or args.model == 'raw_long':
-                    outputs = model(input_ids = batch_data, attention_mask = batch_attention_mask, labels = tokenized_sample, output_hidden_states = True, global_attention_mask = mask)
-                    logits = outputs.logits
-                                    
+                  if args.ablation == 'no_head':
+                    outputs = model(input_ids=batch_data, attention_mask=batch_attention_mask, output_hidden_states=True, global_attention_mask=mask)
+                    hidden_states = outputs.hidden_states[-1]
+                    logits = hidden_states[:, -2, :]
+                    afib_label = tokenized_sample[:, -2]
+                    loss = ce(logits, afib_label) if ce else 0
+                  else:
+                    outputs = model(input_ids=batch_data, attention_mask=batch_attention_mask, labels=tokenized_sample, output_hidden_states=True, global_attention_mask=mask)
+                    logits = outputs.logits                                    
                 loss = outputs.loss
                 loss = torch.mean(loss)
         
@@ -201,10 +233,17 @@ def inference(model, tokenizer, test_dataloader, device, args):
                         
                 if args.model == 'long' or args.model == 'clin_long' or args.model == 'raw_long':
                     outputs = model(input_ids = batch_data, attention_mask = batch_attention_mask, output_hidden_states = True, output_attentions = True, global_attention_mask = batch_mask)
-                    logits = outputs.logits
-                    preds = torch.argmax(logits, dim=-1)
+                    #logits = outputs.logits
+                    #preds = torch.argmax(logits, dim=-1)
                     attentions = outputs.attentions
                     global_attentions = outputs.global_attentions
+                    if args.ablation == 'no_head':
+                        hidden_states = outputs.hidden_states[-1]  # last layer
+                        logits = hidden_states[:, -2, :]           # second last token for afib
+                        preds = torch.argmax(logits, dim=-1)       # classification only
+                    else:
+                        logits = outputs.logits
+                        preds = torch.argmax(logits, dim=-1)       # full token prediction
                     if int(key[-1][0]) == 0 and not count_norm > 3:
                         tokens_cpu = [tokens.detach().cpu().numpy() for tokens in tokenized_sample]
                         all_tokens.append(tokens_cpu)
