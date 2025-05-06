@@ -102,3 +102,55 @@ Sensitivity: 0.0
 Specificity: 0
 NPV: 0.0
 PPV: 0
+Model:long, Args:Namespace(lr=0.0001, patience=5, signal_size=250, device='cuda:0', warmup=2000, epochs=50, batch=1, weight_decay=0.01, checkpoint='saved_best_0.0001_4_3_0.01_long_True_0.75_1.0_1.0_False_0.1_False_False_False', model='long', mask=0.75, TS=False, TA=False, LF=False, toy=False, inference=True, ablation=None)MSE for Signal Interpolation: 26.500231705359184
+MAE for Signal Interpolation: 2.8546816233110923
+Average Accuracy for AFib: 1.0
+Confusion Matrix: [[1200]]
+ravel error
+Model:long, Args:Namespace(lr=0.0001, patience=5, signal_size=250, device='cuda:0', warmup=2000, epochs=50, batch=1, weight_decay=0.01, checkpoint='saved_best_0.0001_4_3_0.01_long_True_0.75_1.0_1.0_False_0.1_False_False_False', model='long', mask=0.75, TS=False, TA=False, LF=True, toy=False, inference=True, ablation=None)MSE for Signal Interpolation: 26.86708932613954
+MAE for Signal Interpolation: 2.867056912841896
+Average Accuracy for AFib: 0.7491666666666666
+Confusion Matrix: [[0, 301], [0, 899]]
+Sensitivity: 0.0
+Specificity: 1.0
+NPV: 0.7491666666666666
+PPV: 0
+Model:long, Args:Namespace(lr=0.0001, patience=5, signal_size=250, device='cuda:0', warmup=2000, epochs=50, batch=1, weight_decay=0.01, checkpoint='saved_best_0.0001_4_3_0.01_long_True_0.75_1.0_1.0_False_0.1_False_False_False', model='long', mask=0.75, TS=True, TA=False, LF=False, toy=False, inference=True, ablation=None)MSE for Signal Interpolation: 20.488044067133742
+MAE for Signal Interpolation: 2.263154540504329
+Average Accuracy for AFib: 1.0
+Confusion Matrix: [[1200]]
+ravel error
+Model:long, Args:Namespace(lr=0.0001, patience=5, signal_size=250, device='cuda:0', warmup=2000, epochs=50, batch=1, weight_decay=0.01, checkpoint='saved_best_0.0001_4_3_0.01_long_True_0.75_1.0_1.0_False_0.1_False_False_False', model='long', mask=0.75, TS=True, TA=False, LF=True, toy=False, inference=True, ablation=None)MSE for Signal Interpolation: 19.62287581191786
+MAE for Signal Interpolation: 2.195521985373149
+Average Accuracy for AFib: 0.75
+Confusion Matrix: [[0, 300], [0, 900]]
+Sensitivity: 0.0
+Specificity: 1.0
+NPV: 0.75
+PPV: 0
+Model:long, Args:Namespace(lr=0.0001, patience=5, signal_size=250, device='cuda:0', warmup=2000, epochs=50, batch=1, weight_decay=0.01, checkpoint='saved_best_0.0001_5_3_0.01_long_True_0.75_1.0_1.0_False_0.1_False_False_False', model='long', mask=0.75, TS=False, TA=False, LF=False, toy=False, inference=True, ablation=None)MSE for Signal Interpolation: 0.7740606465542805
+MAE for Signal Interpolation: 0.3191438938382392
+Average Accuracy for AFib: 1.0
+Confusion Matrix: [[1200]]
+ravel error
+Model:long, Args:Namespace(lr=0.0001, patience=5, signal_size=250, device='cuda:0', warmup=2000, epochs=50, batch=1, weight_decay=0.01, checkpoint='saved_best_0.0001_5_3_0.01_long_True_0.75_1.0_1.0_False_0.1_False_False_False', model='long', mask=0.75, TS=False, TA=False, LF=True, toy=False, inference=True, ablation=None)MSE for Signal Interpolation: 0.7784822377682818
+MAE for Signal Interpolation: 0.32021374446650347
+Average Accuracy for AFib: 0.7516666666666667
+Confusion Matrix: [[0, 298], [0, 902]]
+Sensitivity: 0.0
+Specificity: 1.0
+NPV: 0.7516666666666667
+PPV: 0
+Model:long, Args:Namespace(lr=0.0001, patience=5, signal_size=250, device='cuda:0', warmup=2000, epochs=50, batch=1, weight_decay=0.01, checkpoint='saved_best_0.0001_5_3_0.01_long_True_0.75_1.0_1.0_False_0.1_False_False_False', model='long', mask=0.75, TS=True, TA=False, LF=False, toy=False, inference=True, ablation=None)MSE for Signal Interpolation: 0.5538310947138476
+MAE for Signal Interpolation: 0.25623811699372406
+Average Accuracy for AFib: 1.0
+Confusion Matrix: [[1200]]
+ravel error
+Model:long, Args:Namespace(lr=0.0001, patience=5, signal_size=250, device='cuda:0', warmup=2000, epochs=50, batch=1, weight_decay=0.01, checkpoint='saved_best_0.0001_5_3_0.01_long_True_0.75_1.0_1.0_False_0.1_False_False_False', model='long', mask=0.75, TS=True, TA=False, LF=True, toy=False, inference=True, ablation=None)MSE for Signal Interpolation: 0.5868979737377958
+MAE for Signal Interpolation: 0.26164247079364333
+Average Accuracy for AFib: 0.7408333333333333
+Confusion Matrix: [[0, 311], [0, 889]]
+Sensitivity: 0.0
+Specificity: 1.0
+NPV: 0.7408333333333333
+PPV: 0

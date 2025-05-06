@@ -39,6 +39,7 @@ def get_args():
     parser.add_argument('--toy', action = 'store_true', help = 'Please choose whether to use a toy dataset or not')
     parser.add_argument('--norm_loss', type=float, default=0.1, help = "Specify norm loss coefficient")
     parser.add_argument('--inference', action='store_true', help = 'Please choose whether it is inference or not')
+    parser.add_argument('--ablation', type=str, default=None, choices=['no_head', 'frozen'])
     return parser.parse_args()
     
     
@@ -153,6 +154,14 @@ def main():
         tokenizer.add_tokens(custom_tokens)
         model.resize_token_embeddings(len(tokenizer))
         model_hidden_size = model.config.hidden_size
+        if args.ablation == 'no_head':
+            model.lm_head = torch.nn.Identity()
+
+        if args.ablation == 'frozen':
+            for param in model.base_model.parameters():
+                param.requires_grad = False
+
+
             
     if args.model == 'raw_long':
         configuration = LongformerConfig()

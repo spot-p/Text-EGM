@@ -30,6 +30,7 @@ def get_args():
     parser.add_argument('--LF', action='store_true', help = 'Please choose whether to do label flipping')    
     parser.add_argument('--toy', action = 'store_true', help = 'Please choose whether to use a toy dataset or not')
     parser.add_argument('--inference', action='store_true', help = 'Please choose whether it is inference or not')
+    parser.add_argument('--ablation', type=str, default=None, choices=['no_head', 'frozen'])
     return parser.parse_args()
 
 def create_toy(dataset, spec_ind):
