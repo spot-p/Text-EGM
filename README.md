@@ -14,7 +14,8 @@ You can follow along with the reproduction of this paper in Colab by clicking he
 
 The notebook is categorized into appropriate sections as below:
 
-1) Data Aquisition and Preprocessing : Fetches the external dataset, unzips, normalizes and structures and creates train,test,val.
-2) Training : Trains one model at a time, for all 4 models. BigBird, LongFormer, Clinical BigBird and Clinical LongFormer.
-3) Inference : Runs inference against the trained best checkpoint and appends the results to results.txt
-4) Visualization : (Optional) Generates visualizations using integrated gradients which helps with interpretability.
+1) Clones this repository in Colab and installs dependencies.
+2) Data Aquisition and Preprocessing : Fetches the external dataset, unzips, normalizes and structures and creates train,test,val.
+3) Training : Trains one model at a time, for all 4 models. BigBird, LongFormer, Clinical BigBird and Clinical LongFormer.
+4) Inference : Runs inference against the trained best checkpoint and appends the results to results.txt
+5) Visualization : (Optional) Generates visualizations using integrated gradients which helps with interpretability.
