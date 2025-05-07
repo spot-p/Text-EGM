@@ -9,4 +9,12 @@ The reproduced results are completely based on the external dataset alone.
 The external dataset used in the paper is from (Goldberger et al., 2000) accessible here: https://physionet.org/content/iafdb/1.0.0/
 
 ## Setup Instructions:
+You can follow along with the reproduction of this paper in Colab by clicking here.
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github.com/spot-p/Text-EGM/blob/main/project_reproduction_driver.ipynb)
 
+The notebook is categorized into appropriate sections as below:
+
+1) Data Aquisition and Preprocessing : Fetches the external dataset, unzips, normalizes and structures and creates train,test,val.
+2) Training : Trains one model at a time, for all 4 models. BigBird, LongFormer, Clinical BigBird and Clinical LongFormer.
+3) Inference : Runs inference against the trained best checkpoint and appends the results to results.txt
+4) Visualization : (Optional) Generates visualizations using integrated gradients which helps with interpretability.
